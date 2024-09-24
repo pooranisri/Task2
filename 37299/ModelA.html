@@ -5,148 +5,141 @@
 <title>Kids Bowling Game</title>
 <style>
     body {
-        background: #f0f0f0;
+        font-family: 'Arial', sans-serif;
+        background-color: #f0f8ff;
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
         margin: 0;
-        font-family: 'Arial', sans-serif;
     }
-    .bowling-alley {
-        position: relative;
-        width: 500px;
-        height: 300px;
-        background: #d3d3d3;
-        border: 5px solid #808080;
-        overflow: hidden;
+    #gameCanvas {
+        border: 3px solid #000;
+        background: url('https://via.placeholder.com/600x300?text=Bowling+Alley') no-repeat center;
+        background-size: cover;
     }
-    .lane {
-        width: 100%;
-        height: 100%;
-        background: repeating-linear-gradient(to right, #fff 0%, #fff 1%, #8B4513 1%, #8B4513 10%, #fff 10%);
+    #scoreBoard {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 10px;
+        border-radius: 5px;
     }
     .pin {
         position: absolute;
-        width: 30px;
-        height: 30px;
-        background: white;
-        border-radius: 50%;
-        border: 2px solid black;
-        bottom: 10px;
+        width: 20px;
+        height: 60px;
+        background: url('https://via.placeholder.com/20x60?text=Pin') no-repeat center;
     }
-    .ball {
+    #ball {
         position: absolute;
         width: 40px;
         height: 40px;
-        background: radial-gradient(circle at 10px 10px, #fff, #000);
+        background: url('https://via.placeholder.com/40?text=Ball') no-repeat center;
         border-radius: 50%;
-        bottom: 20px;
-        left: 230px;
         cursor: pointer;
-    }
-    .arrow {
-        position: absolute;
-        width: 0; 
-        height: 0; 
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-top: 20px solid red;
-        bottom: 60px;
-        left: 250px;
-    }
-    .scoreboard {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: #fff;
-        padding: 10px;
-        border: 2px solid black;
-        font-size: 20px;
     }
 </style>
 </head>
 <body>
-
-<div class="bowling-alley">
-    <div class="lane" id="lane">
-        <div class="ball" id="ball"></div>
-        <div class="arrow" id="arrow"></div>
-        <!-- Pins will be added here dynamically -->
-    </div>
-    <div class="scoreboard">Score: <span id="score">0</span></div>
-</div>
+<div id="scoreBoard">Score: <span id="score">0</span></div>
+<canvas id="gameCanvas" width="600" height="300"></canvas>
+<div id="ball"></div>
 
 <script>
-    const lane = document.getElementById('lane');
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
     const ball = document.getElementById('ball');
-    const arrow = document.getElementById('arrow');
-    const scoreDisplay = document.getElementById('score');
     let score = 0;
-    let chance = 1;
-    let pins = [];
+    let attempts = 3;
+    const pins = [
+        {x: 400, y: 100}, {x: 420, y: 100}, {x: 440, y: 100},
+        {x: 410, y: 120}, {x: 430, y: 120},
+        {x: 420, y: 140}
+    ];
 
-    function setupPins() {
-        const pinPositions = [
-            {x: 250, y: 10}, {x: 230, y: 20}, {x: 270, y: 20},
-            {x: 210, y: 30}, {x: 250, y: 30}, {x: 290, y: 30},
-            {x: 190, y: 40}, {x: 230, y: 40}, {x: 270, y: 40}, {x: 310, y: 40}
-        ];
-        pins = pinPositions.map(pos => {
-            const pin = document.createElement('div');
-            pin.className = 'pin';
-            pin.style.left = `${pos.x}px`;
-            pin.style.bottom = `${pos.y}px`;
-            lane.appendChild(pin);
-            return { element: pin, knocked: false };
+    // Function to draw pins
+    function drawPins() {
+        pins.forEach(pin => {
+            ctx.fillRect(pin.x, pin.y, 20, 60);
         });
     }
 
-    function moveBall(e) {
-        const rect = lane.getBoundingClientRect();
-        const x = e.clientX - rect.left - ball.offsetWidth / 2;
-        if(x > 0 && x < lane.offsetWidth - ball.offsetWidth) {
-            ball.style.left = `${x}px`;
-            arrow.style.left = `${x + ball.offsetWidth / 2 - 10}px`;
-        }
+    // Reset pins and ball position
+    function resetGame() {
+        pins.forEach(pin => pin.knocked = false);
+        ball.style.left = '100px';
+        ball.style.bottom = '20px';
+        drawPins();
     }
+
+    // Draw initial state
+    resetGame();
+
+    // Ball movement
+    let moving = false;
+    let posX = 100, posY = 20;
+
+    ball.onmousedown = function(event) {
+        moving = true;
+    };
+
+    document.onmousemove = function(event) {
+        if (moving) {
+            posX = event.clientX - canvas.offsetLeft - 20;
+            posY = canvas.height - event.clientY + document.body.scrollTop - 20;
+            if (posX > 0 && posX < canvas.width - 40) ball.style.left = posX + 'px';
+            if (posY > 0 && posY < canvas.height - 40) ball.style.bottom = posY + 'px';
+        }
+    };
+
+    document.onmouseup = function() {
+        moving = false;
+        rollBall();
+    };
 
     function rollBall() {
-        if (chance > 3) return;
-        const ballRect = ball.getBoundingClientRect();
-        const knockedPins = pins.filter(pin => {
-            const pinRect = pin.element.getBoundingClientRect();
-            if (!pin.knocked && 
-                ballRect.right > pinRect.left && 
-                ballRect.left < pinRect.right && 
-                ballRect.bottom > pinRect.top && 
-                ballRect.top < pinRect.bottom) {
-                pin.knocked = true;
-                pin.element.style.visibility = 'hidden';
-                return true;
+        if (attempts > 0) {
+            let velocityX = (420 - posX) / 50; // Simplistic velocity towards pins
+            let velocityY = (150 - posY) / 50;
+            let frames = 0;
+
+            function animate() {
+                if (frames < 50) {
+                    posX += velocityX;
+                    posY += velocityY;
+                    ball.style.left = posX + 'px';
+                    ball.style.bottom = posY + 'px';
+                    checkCollision();
+                    frames++;
+                    requestAnimationFrame(animate);
+                } else {
+                    updateScore();
+                    attempts--;
+                    if (attempts > 0) resetGame();
+                }
             }
-            return false;
-        });
-        score += knockedPins.length;
-        scoreDisplay.textContent = score;
-        chance += 1;
-        if (chance <= 3) {
-            setTimeout(resetBallAndPins, 2000);
+            animate();
         }
     }
 
-    function resetBallAndPins() {
-        ball.style.left = '230px';
-        arrow.style.left = '250px';
-        pins.forEach(pin => {
-            pin.knocked = false;
-            pin.element.style.visibility = 'visible';
+    function checkCollision() {
+        pins.forEach((pin, index) => {
+            if (!pin.knocked && 
+                posX + 20 > pin.x && posX < pin.x + 20 && 
+                posY + 20 > pin.y && posY < pin.y + 60) {
+                pin.knocked = true;
+                ctx.clearRect(pin.x, pin.y, 20, 60);
+            }
         });
     }
 
-    setupPins();
-    lane.addEventListener('mousemove', moveBall);
-    lane.addEventListener('click', rollBall);
+    function updateScore() {
+        const knocked = pins.filter(pin => pin.knocked).length;
+        score += knocked;
+        document.getElementById('score').textContent = score;
+    }
 </script>
 
 </body>

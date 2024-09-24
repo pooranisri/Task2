@@ -4,112 +4,153 @@
 <meta charset="UTF-8">
 <title>Kids Bowling Game</title>
 <style>
-    body { 
-        font-family: 'Arial', sans-serif; 
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #f0f0f0;
-        height: 100vh;
-        margin: 0;
-    }
-    #gameCanvas {
-        background: #fff;
-        border: 2px solid #333;
-    }
-    #scoreBoard {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: rgba(255, 255, 255, 0.8);
-        padding: 10px;
-        border-radius: 5px;
-    }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+  #gameContainer {
+    position: relative;
+    width: 600px;
+    height: 300px;
+    background: #fff;
+    border: 2px solid #000;
+    overflow: hidden;
+  }
+  .lane {
+    width: 100%;
+    height: 100%;
+    background: #d3d3d3;
+  }
+  .ball {
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle at 10px 10px, #ff0000, #000);
+    border-radius: 50%;
+    position: absolute;
+    bottom: 10px;
+    left: 285px;
+  }
+  .pin {
+    width: 20px;
+    height: 40px;
+    background: #fff;
+    border: 2px solid #000;
+    border-radius: 50% 50% 40% 40% / 30% 30% 70% 70%;
+    position: absolute;
+    top: 20px;
+  }
+  #scoreboard {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 5px;
+    border: 1px solid #000;
+  }
 </style>
 </head>
 <body>
-<div id="scoreBoard">Score: <span id="score">0</span></div>
-<canvas id="gameCanvas" width="400" height="600"></canvas>
+
+<div id="gameContainer">
+  <div class="lane">
+    <div id="ball" class="ball"></div>
+    <!-- Pins will be dynamically created here -->
+  </div>
+  <div id="scoreboard">Score: <span id="score">0</span></div>
+</div>
 
 <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+document.addEventListener('DOMContentLoaded', (event) => {
+    const gameContainer = document.getElementById('gameContainer');
+    const ball = document.getElementById('ball');
     const scoreDisplay = document.getElementById('score');
     let score = 0;
-    let chances = 3;
+    let chance = 1;
+    const totalPins = 10;
+    let pins = [];
 
-    // Bowling elements
-    const ball = { x: 200, y: 550, radius: 15, color: 'red' };
-    const pins = [
-        {x: 200, y: 150, standing: true},
-        {x: 180, y: 170, standing: true}, {x: 220, y: 170, standing: true},
-        {x: 160, y: 190, standing: true}, {x: 200, y: 190, standing: true}, {x: 240, y: 190, standing: true}
-    ];
-
-    // Draw function
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // Draw lane
-        ctx.fillStyle = '#8B4513';
-        ctx.fillRect(0, 0, 400, 600);
-        // Draw ball
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        ctx.fillStyle = ball.color;
-        ctx.fill();
-        // Draw pins
-        pins.forEach(pin => {
-            if(pin.standing) {
-                ctx.beginPath();
-                ctx.arc(pin.x, pin.y, 10, 0, Math.PI * 2);
-                ctx.fillStyle = 'white';
-                ctx.fill();
-            }
+    function setupPins() {
+        const pinPositions = [
+            {x: 280, y: 20}, {x: 300, y: 20}, {x: 320, y: 20}, {x: 340, y: 20},
+            {x: 290, y: 40}, {x: 310, y: 40}, {x: 330, y: 40},
+            {x: 300, y: 60}, {x: 320, y: 60},
+            {x: 310, y: 80}
+        ];
+        pins = pinPositions.map(pos => {
+            let pin = document.createElement('div');
+            pin.className = 'pin';
+            pin.style.left = `${pos.x}px`;
+            pin.style.top = `${pos.y}px`;
+            gameContainer.querySelector('.lane').appendChild(pin);
+            return {element: pin, knocked: false};
         });
     }
 
-    // Ball movement and collision
-    canvas.onclick = function(event) {
-        if(chances > 0) {
-            let rect = canvas.getBoundingClientRect();
-            let mouseX = event.clientX - rect.left;
-            let direction = (mouseX - ball.x) / 10; // Simple direction calculation
-            
-            function moveBall() {
-                ball.x += direction;
-                ball.y -= 10; // Ball moves up
-                draw();
-                
-                // Collision check
-                pins.forEach((pin, index) => {
-                    if(pin.standing && Math.hypot(ball.x - pin.x, ball.y - pin.y) < ball.radius + 10) {
-                        pin.standing = false;
-                        score += 10;
-                        scoreDisplay.textContent = score;
-                    }
-                });
-                
-                if(ball.y > 0) requestAnimationFrame(moveBall);
-                else resetTurn();
-            }
-            moveBall();
-        }
-    };
-
-    function resetTurn() {
-        chances--;
-        ball.x = 200; // Reset ball position
-        ball.y = 550;
-        if(chances === 0 || pins.every(pin => !pin.standing)) {
-            alert('Game Over! Your score: ' + score);
-            // Reset game here if needed
-        } else {
-            // Reset only knocked down pins for next chance
-            pins.forEach(pin => pin.standing = true);
-        }
+    function resetBall() {
+        ball.style.left = '285px';
+        ball.style.bottom = '10px';
     }
 
-    draw();
+    function updateScore(pinsKnocked) {
+        score += pinsKnocked;
+        scoreDisplay.textContent = score;
+    }
+
+    function checkCollision(ball, pin) {
+        const ballRect = ball.getBoundingClientRect();
+        const pinRect = pin.element.getBoundingClientRect();
+        return !(
+            ballRect.right < pinRect.left || 
+            ballRect.left > pinRect.right || 
+            ballRect.bottom < pinRect.top || 
+            ballRect.top > pinRect.bottom
+        );
+    }
+
+    function rollBall() {
+        if (chance > 3) return;
+        let pos = parseInt(ball.style.left);
+        const rollInterval = setInterval(() => {
+            if (pos < 570) {
+                pos += 5;
+                ball.style.left = pos + 'px';
+                pins.forEach(pin => {
+                    if (!pin.knocked && checkCollision(ball, pin)) {
+                        pin.element.style.display = 'none';
+                        pin.knocked = true;
+                    }
+                });
+            } else {
+                clearInterval(rollInterval);
+                const knockedPins = pins.filter(pin => pin.knocked).length;
+                updateScore(knockedPins);
+                setTimeout(() => {
+                    pins.forEach(pin => {
+                        if (pin.knocked) {
+                            pin.element.style.display = 'block';
+                            pin.knocked = false;
+                        }
+                    });
+                    resetBall();
+                    chance++;
+                    if (chance > 3) {
+                        alert("Game Over! Your score is " + score);
+                    }
+                }, 1000);
+            }
+        }, 20);
+    }
+
+    gameContainer.addEventListener('click', rollBall);
+    setupPins();
+});
 </script>
+
 </body>
 </html>
