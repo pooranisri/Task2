@@ -48,6 +48,8 @@
         let score = 0;
         let ballX = 50, ballY = 350; // Starting position of the ball
         let ballRadius = 15;
+        let clickCount = 0;
+        let clickTimer = null;
 
         // Initialize pin positions
         function initPins() {
@@ -120,10 +122,6 @@
             drawBall();
             requestAnimationFrame(gameLoop);
         }
-
-        // Track double click for striking
-        let clickCount = 0;
-        let clickTimer = null;
 
         // Mouse left click event to move the ball and check for double click
         canvas.addEventListener('click', (event) => {
