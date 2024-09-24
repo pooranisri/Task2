@@ -61,6 +61,7 @@
         const ballSpeed = 5; 
         let attempts = 0;
         let gameOver = false;
+        let showArrow = true; // Control to show or hide the arrow
 
         // Initialize pins in a triangular formation
         function initializePins() {
@@ -101,12 +102,19 @@
         }
 
         function drawArrow() {
-            ctx.save();
-            ctx.translate(ballX, ballY);
-            ctx.rotate(arrowAngle);
-            ctx.fillStyle = 'yellow';
-            ctx.fillRect(0, -5, 100, 10); // Arrow pointing direction
-            ctx.restore();
+            if (showArrow) {
+                ctx.save();
+                ctx.translate(ballX, ballY);
+                ctx.rotate(arrowAngle);
+                ctx.beginPath();
+                ctx.moveTo(0, -5); // Point of the arrow
+                ctx.lineTo(100, 0); // Line to indicate direction
+                ctx.lineTo(0, 5); // Other side of the arrow
+                ctx.closePath();
+                ctx.fillStyle = 'yellow';
+                ctx.fill();
+                ctx.restore();
+            }
         }
 
         function updateScore() {
@@ -159,6 +167,7 @@
                         resetBall(); // Reset ball position for the next chance
                     }
                     ballMoving = false; // Stop moving the ball
+                    showArrow = false; // Hide the arrow after the strike
                 }
             }
 
@@ -170,6 +179,7 @@
             score = 0;
             attempts = 0;
             gameOver = false;
+            showArrow = true; // Show arrow at the start of the game
             document.getElementById('message').innerText = "";
             resetBall();
             initializePins();
