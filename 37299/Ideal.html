@@ -37,7 +37,7 @@
 </head>
 <body>
     <h1>Bowling</h1>
-    <div id="instructions">Left Click to Move the Ball, Right Click to Strike the Pins</div>
+    <div id="instructions">Left Click to Move the Ball 100 Pixels, Right Click to Strike the Pins</div>
     <canvas id="gameCanvas" width="600" height="400"></canvas>
     <div id="scoreboard">Score: 0</div>
     
@@ -48,7 +48,6 @@
         let score = 0;
         let ballX = 50, ballY = 350; // Starting position of the ball
         let ballRadius = 15;
-        let ballMoving = false;
 
         // Initialize pin positions
         function initPins() {
@@ -119,15 +118,13 @@
             drawLane();
             drawPins();
             drawBall();
-            detectCollisions();
             requestAnimationFrame(gameLoop);
         }
 
         // Mouse left click event to move the ball
         canvas.addEventListener('click', (event) => {
-            if (event.button === 0 && !ballMoving) { // Left click
-                ballMoving = true; // Start moving the ball
-                ballX += 100; // Move the ball a fixed distance
+            if (event.button === 0) { // Left click
+                ballX += 100; // Move the ball 100 pixels forward
                 if (ballX > canvas.width) {
                     ballX = 50; // Reset ball position if it goes off screen
                 }
