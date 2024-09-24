@@ -32,7 +32,7 @@
             color: #ff6347;
             margin-top: 20px;
         }
-        #startButton {
+        #newButton {
             padding: 10px 20px;
             font-size: 18px;
             margin-top: 20px;
@@ -44,7 +44,7 @@
     <canvas id="gameCanvas" width="1000" height="440"></canvas>
     <div id="scoreboard">Score: 0</div>
     <div id="message"></div>
-    <button id="startButton">New Game</button>
+    <button id="newButton">New Game</button>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -189,7 +189,7 @@
             requestAnimationFrame(gameLoop);
         }
 
-        document.getElementById('startButton').addEventListener('click', () => {
+        document.getElementById('newButton').addEventListener('click', () => {
             score = 0;
             attempts = 0;
             gameOver = false;
