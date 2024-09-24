@@ -41,7 +41,7 @@
 </head>
 <body>
     <h1>Bowling</h1>
-    <canvas id="gameCanvas" width="1000" height="400"></canvas>
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
     <div id="scoreboard">Score: 0</div>
     <div id="message"></div>
     <button id="startButton">New Game</button>
@@ -50,8 +50,8 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const ballRadius = 15;
-        let ballX = 500;  
-        let ballY = 350;  
+        let ballX = 400;  
+        let ballY = 450;  
         let score = 0;
         const pins = [];
         const pinWidth = 20;
@@ -70,7 +70,7 @@
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col <= row; col++) {
                     pins.push({
-                        x: 500 + (col - row / 2) * (pinWidth + 10),
+                        x: 400 + (col - row / 2) * (pinWidth + 10),
                         y: 30 + row * (pinHeight + 10), // Move pins closer to the top
                         knocked: false
                     });
@@ -82,7 +82,7 @@
             ctx.fillStyle = '#D2B48C'; // Sandal color for the bowling alley
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#000';
-            ctx.fillRect(0, 310, canvas.width, 30); // Increased bowling lane height to 30px
+            ctx.fillRect(0, 370, canvas.width, 60); // Increased bowling lane height
         }
 
         function drawBall() {
@@ -147,8 +147,8 @@
         }
 
         function resetBall() {
-            ballX = 500; // Reset to initial position
-            ballY = 350;
+            ballX = 400; // Reset to initial position
+            ballY = 450;
         }
 
         function endGame(message) {
