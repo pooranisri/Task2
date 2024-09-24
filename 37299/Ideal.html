@@ -41,7 +41,7 @@
 </head>
 <body>
     <h1>Bowling</h1>
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <canvas id="gameCanvas" width="1000" height="500"></canvas>
     <div id="scoreboard">Score: 0</div>
     <div id="message"></div>
     <button id="startButton">New Game</button>
@@ -50,8 +50,8 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const ballRadius = 15;
-        let ballX = 400;  
-        let ballY = 350;  
+        let ballX = 500;  
+        let ballY = 450;  
         let score = 0;
         const pins = [];
         const pinWidth = 20;
@@ -69,7 +69,7 @@
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col <= row; col++) {
                     pins.push({
-                        x: 400 + (col - row / 2) * (pinWidth + 10),
+                        x: 500 + (col - row / 2) * (pinWidth + 10),
                         y: 50 + row * (pinHeight + 10),
                         knocked: false
                     });
@@ -78,10 +78,10 @@
         }
 
         function drawBowlingLane() {
-            ctx.fillStyle = '#D3D3D3';
+            ctx.fillStyle = '#8B4513'; // Brown color for the bowling alley
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#000';
-            ctx.fillRect(0, 360, canvas.width, 40); // Bowling lane
+            ctx.fillRect(0, 440, canvas.width, 60); // Bowling lane
         }
 
         function drawBall() {
@@ -95,7 +95,12 @@
             pins.forEach(pin => {
                 if (!pin.knocked) {
                     ctx.fillStyle = 'white';
-                    ctx.fillRect(pin.x, pin.y, pinWidth, pinHeight);
+                    ctx.beginPath();
+                    ctx.moveTo(pin.x + pinWidth / 2, pin.y); // Top point
+                    ctx.lineTo(pin.x, pin.y + pinHeight); // Bottom left
+                    ctx.lineTo(pin.x + pinWidth, pin.y + pinHeight); // Bottom right
+                    ctx.closePath();
+                    ctx.fill();
                 }
             });
         }
@@ -127,8 +132,8 @@
         }
 
         function resetBall() {
-            ballX = 400; // Reset to initial position
-            ballY = 350;
+            ballX = 500; // Reset to initial position
+            ballY = 450;
         }
 
         function endGame(message) {
