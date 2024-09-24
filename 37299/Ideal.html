@@ -71,7 +71,7 @@
                 for (let col = 0; col <= row; col++) {
                     pins.push({
                         x: 500 + (col - row / 2) * (pinWidth + 10),
-                        y: 50 + row * (pinHeight + 10),
+                        y: 30 + row * (pinHeight + 10), // Move pins closer to the top
                         knocked: false
                     });
                 }
@@ -82,7 +82,7 @@
             ctx.fillStyle = '#D2B48C'; // Sandal color for the bowling alley
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#000';
-            ctx.fillRect(0, 340, canvas.width, 60); // Bowling lane
+            ctx.fillRect(0, 310, canvas.width, 30); // Increased bowling lane height to 30px
         }
 
         function drawBall() {
