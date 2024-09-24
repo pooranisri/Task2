@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bowling Game for Kids</title>
     <style>
         body {
@@ -60,6 +60,7 @@
         const ballSpeed = 5; 
         let attempts = 0;
         let gameOver = false;
+        let showArrow = true; // Control to show or hide the arrow
 
         // Initialize pins in a triangular formation
         function initializePins() {
@@ -99,6 +100,19 @@
             });
         }
 
+        function drawArrow() {
+            if (showArrow) {
+                ctx.setLineDash([5, 5]); // Dotted line
+                ctx.beginPath();
+                ctx.moveTo(ballX, ballY);
+                ctx.lineTo(ballX + 100, ballY); // Arrow pointing straight
+                ctx.strokeStyle = 'yellow';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.setLineDash([]); // Reset line dash
+            }
+        }
+
         function updateScore() {
             document.getElementById('scoreboard').innerText = `Score: ${score}`;
         }
@@ -132,6 +146,7 @@
             drawBowlingLane();
             drawBall();
             drawPins();
+            drawArrow();
 
             if (ballMoving) {
                 ballX += ballSpeed; // Move the ball straight
@@ -147,6 +162,7 @@
                         resetBall(); // Reset ball position for the next chance
                     }
                     ballMoving = false; // Stop moving the ball
+                    showArrow = false; // Hide the arrow after the strike
                 }
             }
 
@@ -158,6 +174,7 @@
             score = 0;
             attempts = 0;
             gameOver = false;
+            showArrow = true; // Show arrow at the start of the game
             document.getElementById('message').innerText = "";
             resetBall();
             initializePins();
@@ -166,7 +183,12 @@
         });
 
         canvas.addEventListener('click', (e) => {
-            if (e.button === 0 && !gameOver && !ballMoving) {
+            // Check if the click is within the ball
+            const dx = e.clientX - canvas.offsetLeft - ballX;
+            const dy = e.clientY - canvas.offsetTop - ballY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (e.button === 0 && distance < ballRadius && !gameOver && !ballMoving) {
                 ballMoving = true; // Start moving the ball
             }
         });
