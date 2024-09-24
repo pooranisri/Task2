@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -48,7 +47,7 @@
 
     <script>
         const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+        const canCtx = canvas.getContext('2d');
         const ballRadius = 15;
         let ballX = 500;  
         let ballY = 400;  
@@ -58,20 +57,20 @@
         const pinHeight = 40;
         let arrowAngle = 0;
         let ballMoving = false;
-        const ballSpeed = 3; // Reduced ball speed
+        const ballSpeed = 3;
         let attempts = 0;
         let gameOver = false;
-        let arrowVisible = true; // Arrow visibility flag
+        let arrowVisible = true;
 
         // Initialize pins in a triangular formation at the top of the alley
         function initializePins() {
-            pins.length = 0; // Clear existing pins
+            pins.length = 0;
             const rows = 4;
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col <= row; col++) {
                     pins.push({
                         x: 500 + (col - row / 2) * (pinWidth + 10),
-                        y: 30 + row * (pinHeight + 10), // Moved pins to the top of the alley
+                        y: 30 + row * (pinHeight + 10),
                         knocked: false
                     });
                 }
@@ -79,29 +78,27 @@
         }
 
         function drawBowlingLane() {
-            ctx.fillStyle = '#D2B48C'; // Sandal color for the bowling alley
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 400, canvas.width, 40); // Bowling lane adjusted for new height
+            canCtx.fillStyle = '#D2B48C';
+            canCtx.fillRect(0, 0, canvas.width, canvas.height);
+            canCtx.fillStyle = '#000';
+            canCtx.fillRect(0, 400, canvas.width, 40);
         }
 
         function drawBall() {
-            ctx.fillStyle = 'red';
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-            ctx.fill();
+            canCtx.fillStyle = 'red';
+            canCtx.beginPath();
+            canCtx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            canCtx.fill();
         }
 
         function drawDuckPin(x, y) {
-            ctx.fillStyle = 'white';
-            // Draw the oval body of the pin
-            ctx.beginPath();
-            ctx.ellipse(x + pinWidth / 2, y + pinHeight / 2, pinWidth / 2, pinHeight / 1.5, 0, 0, Math.PI * 2);
-            ctx.fill();
-            // Draw the circular head of the pin
-            ctx.beginPath();
-            ctx.arc(x + pinWidth / 2, y, pinWidth / 2, 0, Math.PI * 2);
-            ctx.fill();
+            canCtx.fillStyle = 'white';
+            canCtx.beginPath();
+            canCtx.ellipse(x + pinWidth / 2, y + pinHeight / 2, pinWidth / 2, pinHeight / 1.5, 0, 0, Math.PI * 2);
+            canCtx.fill();
+            canCtx.beginPath();
+            canCtx.arc(x + pinWidth / 2, y, pinWidth / 2, 0, Math.PI * 2);
+            canCtx.fill();
         }
 
         function drawPins() {
@@ -114,18 +111,18 @@
 
         function drawArrow() {
             if (arrowVisible) {
-                ctx.save();
-                ctx.translate(ballX, ballY);
-                ctx.rotate(arrowAngle);
-                ctx.setLineDash([5, 5]); // Dotted line
-                ctx.strokeStyle = 'white'; // White arrow
-                ctx.lineWidth = 5;
-                ctx.beginPath();
-                ctx.moveTo(0, -5);
-                ctx.lineTo(100, -5); // Arrow pointing direction
-                ctx.stroke();
-                ctx.restore();
-                ctx.setLineDash([]); // Reset to solid lines
+                canCtx.save();
+                canCtx.translate(ballX, ballY);
+                canCtx.rotate(arrowAngle);
+                canCtx.setLineDash([5, 5]);
+                canCtx.strokeStyle = 'white';
+                canCtx.lineWidth = 5;
+                canCtx.beginPath();
+                canCtx.moveTo(0, -5);
+                canCtx.lineTo(100, -5);
+                canCtx.stroke();
+                canCtx.restore();
+                canCtx.setLineDash([]);
             }
         }
 
@@ -147,7 +144,7 @@
         }
 
         function resetBall() {
-            ballX = 500; // Reset to initial position
+            ballX = 500;
             ballY = 400;
         }
 
@@ -155,11 +152,11 @@
             gameOver = true;
             document.getElementById('message').innerText = message;
             ballMoving = false;
-            arrowVisible = true; // Show the arrow again after the game ends
+            arrowVisible = true;
         }
 
         function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canCtx.clearRect(0, 0, canvas.width, canvas.height);
             drawBowlingLane();
             drawBall();
             drawPins();
@@ -170,18 +167,17 @@
                 ballY += ballSpeed * Math.sin(arrowAngle);
                 checkCollision();
 
-                // Stop the ball when it reaches the bottom of the canvas or goes off-screen
                 if (ballY < 0 || ballY > canvas.height) {
                     attempts++;
                     if (score === 10) {
                         endGame("Congratulations, STRIKE!");
-                    } else if (attempts === 3) { // Allow 3 chances
+                    } else if (attempts === 3) {
                         endGame("GAME OVER! You didn't knock down all the pins.");
                     } else {
-                        resetBall(); // Reset ball position for the next chance
-                        arrowVisible = true; // Show the arrow again after resetting
+                        resetBall();
+                        arrowVisible = true;
                     }
-                    ballMoving = false; // Stop moving the ball
+                    ballMoving = false;
                 }
             }
 
@@ -197,7 +193,7 @@
             resetBall();
             initializePins();
             ballMoving = false;
-            arrowVisible = true; // Show the arrow again
+            arrowVisible = true;
             gameLoop();
         });
 
@@ -205,7 +201,7 @@
             if (e.button === 0 && !gameOver) {
                 if (!ballMoving) {
                     ballMoving = true; 
-                    arrowVisible = false; // Hide the arrow on click to roll the ball
+                    arrowVisible = false;
                 }
             }
         });
@@ -216,7 +212,6 @@
             arrowAngle = Math.atan2(dy, dx);
         });
 
-        // Initialize pins and start the game loop
         initializePins();
         gameLoop();
     </script>
