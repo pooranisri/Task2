@@ -7,35 +7,55 @@
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             height: 100vh;
             margin: 0;
             background-color: #87CEEB;
+        }
+        h1 {
+            font-family: Arial, sans-serif;
+            color: #ff6347;
+            margin: 20px;
         }
         #gameCanvas {
             border: 2px solid #000;
             background-color: #D3D3D3;
         }
         #scoreboard {
-            position: absolute;
-            top: 20px;
-            left: 20px;
             font-size: 24px;
             color: #000;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div id="scoreboard">Score: 0</div>
+    <h1>Bowling</h1>
     <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <div id="scoreboard">Score: 0</div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let ballX = 50, ballY = 350;
         let score = 0;
-        const pins = Array(10).fill(true).map((_, i) => ({ x: 400 + (i % 4) * 40, y: 50 + Math.floor(i / 4) * 40, knocked: false }));
+        const pins = [];
+        const pinWidth = 20;
+        const pinHeight = 40;
+
+        // Function to initialize pins in a triangular formation
+        function initializePins() {
+            const rows = 4;
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col <= row; col++) {
+                    pins.push({
+                        x: 400 + (col - row / 2) * (pinWidth + 10),
+                        y: 50 + row * (pinHeight + 10),
+                        knocked: false
+                    });
+                }
+            }
+        }
 
         function drawBowlingLane() {
             ctx.fillStyle = '#D3D3D3';
@@ -55,7 +75,7 @@
             pins.forEach(pin => {
                 if (!pin.knocked) {
                     ctx.fillStyle = 'white';
-                    ctx.fillRect(pin.x, pin.y, 20, 40);
+                    ctx.fillRect(pin.x, pin.y, pinWidth, pinHeight);
                 }
             });
         }
@@ -66,7 +86,11 @@
 
         function checkCollision() {
             pins.forEach(pin => {
-                if (!pin.knocked && ballX + 15 > pin.x && ballX - 15 < pin.x + 20 && ballY + 15 > pin.y && ballY - 15 < pin.y + 40) {
+                if (!pin.knocked && 
+                    ballX + 15 > pin.x && 
+                    ballX - 15 < pin.x + pinWidth && 
+                    ballY + 15 > pin.y && 
+                    ballY - 15 < pin.y + pinHeight) {
                     pin.knocked = true;
                     score++;
                 }
@@ -95,6 +119,8 @@
             e.preventDefault();
         });
 
+        // Initialize pins and start the game loop
+        initializePins();
         gameLoop();
     </script>
 </body>
