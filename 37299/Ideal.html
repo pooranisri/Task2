@@ -79,7 +79,7 @@
         }
 
         function drawBowlingLane() {
-            ctx.fillStyle = '#8B4513'; // Brown color for the bowling alley
+            ctx.fillStyle = '#D2B48C'; // Sandal color for the bowling alley
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 340, canvas.width, 60); // Bowling lane
@@ -94,11 +94,13 @@
 
         function drawDuckPin(x, y) {
             ctx.fillStyle = 'white';
+            // Draw the oval body of the pin
             ctx.beginPath();
-            ctx.moveTo(x + pinWidth / 2, y); // Top point (head)
-            ctx.quadraticCurveTo(x, y + pinHeight / 2, x + pinWidth / 2, y + pinHeight); // Left body
-            ctx.quadraticCurveTo(x + pinWidth, y + pinHeight / 2, x + pinWidth / 2, y); // Right body
-            ctx.closePath();
+            ctx.ellipse(x + pinWidth / 2, y + pinHeight, pinWidth / 2, pinHeight / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // Draw the circular head of the pin
+            ctx.beginPath();
+            ctx.arc(x + pinWidth / 2, y, pinWidth / 2, 0, Math.PI * 2);
             ctx.fill();
         }
 
@@ -116,7 +118,7 @@
                 ctx.translate(ballX, ballY);
                 ctx.rotate(arrowAngle);
                 ctx.setLineDash([5, 5]); // Dotted line
-                ctx.strokeStyle = 'yellow';
+                ctx.strokeStyle = 'white'; // White arrow
                 ctx.lineWidth = 5;
                 ctx.beginPath();
                 ctx.moveTo(0, -5);
