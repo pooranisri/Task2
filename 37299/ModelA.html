@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kids Bowling Game</title>
+<style>
+    body {
+        background: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+    }
+    .bowling-alley {
+        position: relative;
+        width: 500px;
+        height: 300px;
+        background: #d3d3d3;
+        border: 5px solid #808080;
+        overflow: hidden;
+    }
+    .lane {
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(to right, #fff 0%, #fff 1%, #8B4513 1%, #8B4513 10%, #fff 10%);
+    }
+    .pin {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background: white;
+        border-radius: 50%;
+        border: 2px solid black;
+        bottom: 10px;
+    }
+    .ball {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background: radial-gradient(circle at 10px 10px, #fff, #000);
+        border-radius: 50%;
+        bottom: 20px;
+        left: 230px;
+        cursor: pointer;
+    }
+    .arrow {
+        position: absolute;
+        width: 0; 
+        height: 0; 
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 20px solid red;
+        bottom: 60px;
+        left: 250px;
+    }
+    .scoreboard {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #fff;
+        padding: 10px;
+        border: 2px solid black;
+        font-size: 20px;
+    }
+</style>
+</head>
+<body>
+
+<div class="bowling-alley">
+    <div class="lane" id="lane">
+        <div class="ball" id="ball"></div>
+        <div class="arrow" id="arrow"></div>
+        <!-- Pins will be added here dynamically -->
+    </div>
+    <div class="scoreboard">Score: <span id="score">0</span></div>
+</div>
+
+<script>
+    const lane = document.getElementById('lane');
+    const ball = document.getElementById('ball');
+    const arrow = document.getElementById('arrow');
+    const scoreDisplay = document.getElementById('score');
+    let score = 0;
+    let chance = 1;
+    let pins = [];
+
+    function setupPins() {
+        const pinPositions = [
+            {x: 250, y: 10}, {x: 230, y: 20}, {x: 270, y: 20},
+            {x: 210, y: 30}, {x: 250, y: 30}, {x: 290, y: 30},
+            {x: 190, y: 40}, {x: 230, y: 40}, {x: 270, y: 40}, {x: 310, y: 40}
+        ];
+        pins = pinPositions.map(pos => {
+            const pin = document.createElement('div');
+            pin.className = 'pin';
+            pin.style.left = `${pos.x}px`;
+            pin.style.bottom = `${pos.y}px`;
+            lane.appendChild(pin);
+            return { element: pin, knocked: false };
+        });
+    }
+
+    function moveBall(e) {
+        const rect = lane.getBoundingClientRect();
+        const x = e.clientX - rect.left - ball.offsetWidth / 2;
+        if(x > 0 && x < lane.offsetWidth - ball.offsetWidth) {
+            ball.style.left = `${x}px`;
+            arrow.style.left = `${x + ball.offsetWidth / 2 - 10}px`;
+        }
+    }
+
+    function rollBall() {
+        if (chance > 3) return;
+        const ballRect = ball.getBoundingClientRect();
+        const knockedPins = pins.filter(pin => {
+            const pinRect = pin.element.getBoundingClientRect();
+            if (!pin.knocked && 
+                ballRect.right > pinRect.left && 
+                ballRect.left < pinRect.right && 
+                ballRect.bottom > pinRect.top && 
+                ballRect.top < pinRect.bottom) {
+                pin.knocked = true;
+                pin.element.style.visibility = 'hidden';
+                return true;
+            }
+            return false;
+        });
+        score += knockedPins.length;
+        scoreDisplay.textContent = score;
+        chance += 1;
+        if (chance <= 3) {
+            setTimeout(resetBallAndPins, 2000);
+        }
+    }
+
+    function resetBallAndPins() {
+        ball.style.left = '230px';
+        arrow.style.left = '250px';
+        pins.forEach(pin => {
+            pin.knocked = false;
+            pin.element.style.visibility = 'visible';
+        });
+    }
+
+    setupPins();
+    lane.addEventListener('mousemove', moveBall);
+    lane.addEventListener('click', rollBall);
+</script>
+
+</body>
+</html>
