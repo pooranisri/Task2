@@ -25,23 +25,12 @@
         #scoreboard {
             font-size: 24px;
             color: #000;
-            position: absolute;
-            right: 20px;
-            top: 200px; /* Centered in the middle of the alley */
+            margin-top: 10px;
         }
         #message {
             font-size: 24px;
             color: #ff6347;
-            position: absolute;
-            top: 50px; /* Above the alley */
-            left: 50%; 
-            transform: translateX(-50%);
-        }
-        #controls {
-            position: absolute;
-            right: 20px;
-            top: 250px; /* Below the scoreboard */
-            text-align: right;
+            margin-top: 20px;
         }
         #startButton {
             padding: 10px 20px;
@@ -52,19 +41,17 @@
 </head>
 <body>
     <h1>Bowling</h1>
-    <canvas id="gameCanvas" width="600" height="600"></canvas>
+    <canvas id="gameCanvas" width="1000" height="400"></canvas>
     <div id="scoreboard">Score: 0</div>
     <div id="message"></div>
-    <div id="controls">
-        <button id="startButton">New Game</button>
-    </div>
+    <button id="startButton">New Game</button>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const ballRadius = 15;
-        let ballX = 300;  
-        let ballY = 550;  
+        let ballX = 500;  
+        let ballY = 350;  
         let score = 0;
         const pins = [];
         const pinWidth = 20;
@@ -83,8 +70,8 @@
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col <= row; col++) {
                     pins.push({
-                        x: 300 + (col - row / 2) * (pinWidth + 10),
-                        y: 30 + row * (pinHeight + 10), // Move pins closer to the top
+                        x: 500 + (col - row / 2) * (pinWidth + 10),
+                        y: 50 + row * (pinHeight + 10),
                         knocked: false
                     });
                 }
@@ -95,7 +82,7 @@
             ctx.fillStyle = '#D2B48C'; // Sandal color for the bowling alley
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#000';
-            ctx.fillRect(0, 470, canvas.width, 130); // Increased bowling lane height
+            ctx.fillRect(0, 340, canvas.width, 60); // Bowling lane
         }
 
         function drawBall() {
@@ -160,8 +147,8 @@
         }
 
         function resetBall() {
-            ballX = 300; // Reset to initial position
-            ballY = 550;
+            ballX = 500; // Reset to initial position
+            ballY = 350;
         }
 
         function endGame(message) {
