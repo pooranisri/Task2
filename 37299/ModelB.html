@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kids Bowling Game</title>
+<style>
+    body { 
+        font-family: 'Arial', sans-serif; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f0f0f0;
+        height: 100vh;
+        margin: 0;
+    }
+    #gameCanvas {
+        background: #fff;
+        border: 2px solid #333;
+    }
+    #scoreBoard {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 10px;
+        border-radius: 5px;
+    }
+</style>
+</head>
+<body>
+<div id="scoreBoard">Score: <span id="score">0</span></div>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score');
+    let score = 0;
+    let chances = 3;
+
+    // Bowling elements
+    const ball = { x: 200, y: 550, radius: 15, color: 'red' };
+    const pins = [
+        {x: 200, y: 150, standing: true},
+        {x: 180, y: 170, standing: true}, {x: 220, y: 170, standing: true},
+        {x: 160, y: 190, standing: true}, {x: 200, y: 190, standing: true}, {x: 240, y: 190, standing: true}
+    ];
+
+    // Draw function
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Draw lane
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(0, 0, 400, 600);
+        // Draw ball
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = ball.color;
+        ctx.fill();
+        // Draw pins
+        pins.forEach(pin => {
+            if(pin.standing) {
+                ctx.beginPath();
+                ctx.arc(pin.x, pin.y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = 'white';
+                ctx.fill();
+            }
+        });
+    }
+
+    // Ball movement and collision
+    canvas.onclick = function(event) {
+        if(chances > 0) {
+            let rect = canvas.getBoundingClientRect();
+            let mouseX = event.clientX - rect.left;
+            let direction = (mouseX - ball.x) / 10; // Simple direction calculation
+            
+            function moveBall() {
+                ball.x += direction;
+                ball.y -= 10; // Ball moves up
+                draw();
+                
+                // Collision check
+                pins.forEach((pin, index) => {
+                    if(pin.standing && Math.hypot(ball.x - pin.x, ball.y - pin.y) < ball.radius + 10) {
+                        pin.standing = false;
+                        score += 10;
+                        scoreDisplay.textContent = score;
+                    }
+                });
+                
+                if(ball.y > 0) requestAnimationFrame(moveBall);
+                else resetTurn();
+            }
+            moveBall();
+        }
+    };
+
+    function resetTurn() {
+        chances--;
+        ball.x = 200; // Reset ball position
+        ball.y = 550;
+        if(chances === 0 || pins.every(pin => !pin.standing)) {
+            alert('Game Over! Your score: ' + score);
+            // Reset game here if needed
+        } else {
+            // Reset only knocked down pins for next chance
+            pins.forEach(pin => pin.standing = true);
+        }
+    }
+
+    draw();
+</script>
+</body>
+</html>
