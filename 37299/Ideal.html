@@ -7,135 +7,130 @@
     <style>
         body {
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #87CEFA;
             font-family: Arial, sans-serif;
-            background-color: #87CEEB; /* Sky blue background */
         }
-        canvas {
-            border: 2px solid #333;
-            background: #D3D3D3; /* Light gray for the bowling lane */
-            margin-top: 20px;
+        #gameCanvas {
+            border: 2px solid #000;
+            background-color: #FFF;
         }
         #scoreboard {
-            margin: 20px;
+            margin-top: 20px;
             font-size: 24px;
-            color: #333;
-        }
-        button {
-            margin-top: 10px;
-            padding: 10px;
-            font-size: 18px;
-            background-color: #4CAF50; /* Green button */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <h1 style="color: #FF4500;">Bowling Game</h1>
-    <canvas id="bowlingCanvas" width="600" height="400"></canvas>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
     <div id="scoreboard">Score: 0</div>
-    <button id="resetButton">Reset Game</button>
-
-    <audio id="strikeSound" src="strike.mp3" preload="auto"></audio>
-    <audio id="rollSound" src="roll.mp3" preload="auto"></audio>
-
+    
     <script>
-        const canvas = document.getElementById('bowlingCanvas');
+        const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const scoreboard = document.getElementById('scoreboard');
-        const resetButton = document.getElementById('resetButton');
-        const strikeSound = document.getElementById('strikeSound');
-        const rollSound = document.getElementById('rollSound');
+        const pins = [];
+        let score = 0;
+        let ballX = 50, ballY = 350;
+        let ballRadius = 15;
 
-        const laneWidth = 400;
-        const laneHeight = 200;
-        const ballRadius = 15;
-        const ballStartX = 50; // Ball starting X position
-        const ballStartY = 180; // Ball starting Y position
-        const pinPositions = [
-            { x: 290, y: 50 }, { x: 310, y: 50 }, { x: 300, y: 70 },
-            { x: 280, y: 90 }, { x: 300, y: 90 }, { x: 320, y: 90 },
-            { x: 270, y: 110 }, { x: 290, y: 110 }, { x: 310, y: 110 }, { x: 330, y: 110 }
-        ];
+        // Load sound effects
+        const strikeSound = new Audio('https://example.com/strike.mp3'); // Replace with a real URL
+        const rollSound = new Audio('https://example.com/roll.mp3'); // Replace with a real URL
 
-        let ballX = ballStartX, ballY = ballStartY, score = 0;
-        let pins = Array(10).fill(true); // All pins standing
-
-        function drawLane() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#8B4513'; // Brown color for the lane
-            ctx.fillRect(0, 0, laneWidth, laneHeight);
-            drawPins();
-            drawBall();
+        // Initialize pin positions
+        function initPins() {
+            const pinOffsetX = 50, pinOffsetY = 50;
+            for (let row = 0; row < 4; row++) {
+                pins[row] = [];
+                for (let col = 0; col <= row; col++) {
+                    pins[row][col] = { x: 300 + col * pinOffsetX - row * pinOffsetX / 2, y: 50 + row * pinOffsetY, knocked: false };
+                }
+            }
         }
 
+        // Draw bowling lane
+        function drawLane() {
+            ctx.fillStyle = "#8B4513"; // Brown color for lane
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Draw pins
         function drawPins() {
-            ctx.fillStyle = '#fff';
-            pins.forEach((isStanding, index) => {
-                if (isStanding) {
-                    const { x, y } = pinPositions[index];
-                    ctx.save();
-                    ctx.translate(x, y);
-                    ctx.rotate(Math.PI / 4); // Rotate pins slightly
-                    ctx.fillRect(-5, -15, 10, 30); // Draw pin shape
-                    ctx.restore();
-                }
+            pins.forEach(row => {
+                row.forEach(pin => {
+                    if (!pin.knocked) {
+                        ctx.fillStyle = "white";
+                        ctx.beginPath();
+                        ctx.arc(pin.x, pin.y, 10, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                });
             });
         }
 
+        // Draw ball
         function drawBall() {
-            ctx.fillStyle = '#FF4500'; // Bright orange for the ball
+            ctx.fillStyle = "blue";
             ctx.beginPath();
             ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
         }
 
+        // Update the scoreboard
+        function updateScore() {
+            document.getElementById('scoreboard').innerText = `Score: ${score}`;
+        }
+
+        // Detect collision
         function detectCollisions() {
-            pins.forEach((isStanding, index) => {
-                if (isStanding) {
-                    const { x, y } = pinPositions[index];
-                    const distance = Math.sqrt((ballX - x) ** 2 + (ballY - y) ** 2);
-                    if (distance < ballRadius + 10) { // 10 is pin height/2
-                        pins[index] = false;
+            pins.forEach(row => {
+                row.forEach(pin => {
+                    if (!pin.knocked && 
+                        ballX + ballRadius > pin.x - 10 && 
+                        ballX - ballRadius < pin.x + 10 && 
+                        ballY + ballRadius > pin.y - 10 && 
+                        ballY - ballRadius < pin.y + 10) {
+                        pin.knocked = true;
                         score++;
-                        rollSound.play();
+                        strikeSound.play();
                     }
-                }
+                });
             });
+            updateScore();
         }
 
-        function updateScoreboard() {
-            scoreboard.innerText = `Score: ${score}`;
-            if (score === 10) {
-                strikeSound.play();
-                alert('Strike! All pins knocked down!');
-            }
-        }
-
-        canvas.addEventListener('click', () => {
-            ballX = ballStartX; // Reset ball position
-            ballY = ballStartY; // Reset ball position
+        // Game loop
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawLane();
+            drawPins();
+            drawBall();
             detectCollisions();
-            drawLane();
-            updateScoreboard();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Mouse click event to roll the ball
+        canvas.addEventListener('click', () => {
+            rollSound.play();
+            ballX += 100; // Move ball forward
+            if (ballX > canvas.width) {
+                ballX = 50; // Reset ball position
+                pins.forEach(row => row.forEach(pin => pin.knocked = false)); // Reset pins
+                score = 0; // Reset score
+                updateScore();
+            }
         });
 
-        resetButton.addEventListener('click', () => {
-            score = 0;
-            pins.fill(true);
-            drawLane();
-            updateScoreboard();
-        });
-
-        drawLane(); // Initial draw
+        // Initialize game
+        initPins();
+        updateScore();
+        gameLoop();
     </script>
 </body>
 </html>
