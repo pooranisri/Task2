@@ -41,7 +41,7 @@
 </head>
 <body>
     <h1>Bowling</h1>
-    <canvas id="gameCanvas" width="1000" height="400"></canvas>
+    <canvas id="gameCanvas" width="1000" height="440"></canvas>
     <div id="scoreboard">Score: 0</div>
     <div id="message"></div>
     <button id="startButton">New Game</button>
@@ -51,7 +51,7 @@
         const ctx = canvas.getContext('2d');
         const ballRadius = 15;
         let ballX = 500;  
-        let ballY = 350;  
+        let ballY = 400;  
         let score = 0;
         const pins = [];
         const pinWidth = 20;
@@ -63,7 +63,7 @@
         let gameOver = false;
         let arrowVisible = true; // Arrow visibility flag
 
-        // Initialize pins in a triangular formation
+        // Initialize pins in a triangular formation at the top of the alley
         function initializePins() {
             pins.length = 0; // Clear existing pins
             const rows = 4;
@@ -71,7 +71,7 @@
                 for (let col = 0; col <= row; col++) {
                     pins.push({
                         x: 500 + (col - row / 2) * (pinWidth + 10),
-                        y: 50 + row * (pinHeight + 10),
+                        y: 30 + row * (pinHeight + 10), // Moved pins to the top of the alley
                         knocked: false
                     });
                 }
@@ -82,7 +82,7 @@
             ctx.fillStyle = '#D2B48C'; // Sandal color for the bowling alley
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#000';
-            ctx.fillRect(0, 340, canvas.width, 60); // Bowling lane
+            ctx.fillRect(0, 400, canvas.width, 40); // Bowling lane adjusted for new height
         }
 
         function drawBall() {
@@ -148,7 +148,7 @@
 
         function resetBall() {
             ballX = 500; // Reset to initial position
-            ballY = 350;
+            ballY = 400;
         }
 
         function endGame(message) {
@@ -175,7 +175,7 @@
                     attempts++;
                     if (score === 10) {
                         endGame("Congratulations, STRIKE!");
-                    } else if (attempts === 2) {
+                    } else if (attempts === 3) { // Allow 3 chances
                         endGame("GAME OVER! You didn't knock down all the pins.");
                     } else {
                         resetBall(); // Reset ball position for the next chance
