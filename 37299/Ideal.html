@@ -37,8 +37,8 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const ballX = 400;  // Ball is centered horizontally
-        const ballY = 350;  // Fixed vertical position for the ball
+        const ballX = 400;  // Fixed horizontal position for the ball
+        let ballY = 350;     // Fixed vertical position for the ball
         let score = 0;
         const pins = [];
         const pinWidth = 20;
@@ -125,9 +125,9 @@
                 // Check for collisions with pins
                 checkCollision();
 
-                // Stop moving if the ball reaches a certain position
-                if (ballY < 0) {
-                    ballMoving = false; // Stop moving the ball when it goes off-screen
+                // Stop moving if the ball reaches a certain position (below the pins)
+                if (ballY < 0 || pins.every(pin => pin.knocked)) {
+                    ballMoving = false; // Stop moving the ball when it goes off-screen or all pins are knocked down
                 }
             }
 
