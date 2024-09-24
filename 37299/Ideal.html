@@ -41,7 +41,7 @@
 </head>
 <body>
     <h1>Bowling</h1>
-    <canvas id="gameCanvas" width="1000" height="500"></canvas>
+    <canvas id="gameCanvas" width="1000" height="400"></canvas>
     <div id="scoreboard">Score: 0</div>
     <div id="message"></div>
     <button id="startButton">New Game</button>
@@ -51,14 +51,14 @@
         const ctx = canvas.getContext('2d');
         const ballRadius = 15;
         let ballX = 500;  
-        let ballY = 450;  
+        let ballY = 350;  
         let score = 0;
         const pins = [];
         const pinWidth = 20;
         const pinHeight = 40;
         let arrowAngle = 0;
         let ballMoving = false;
-        const ballSpeed = 5; 
+        const ballSpeed = 3; // Reduced ball speed
         let attempts = 0;
         let gameOver = false;
         let arrowVisible = true; // Arrow visibility flag
@@ -82,7 +82,7 @@
             ctx.fillStyle = '#8B4513'; // Brown color for the bowling alley
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#000';
-            ctx.fillRect(0, 440, canvas.width, 60); // Bowling lane
+            ctx.fillRect(0, 340, canvas.width, 60); // Bowling lane
         }
 
         function drawBall() {
@@ -92,16 +92,20 @@
             ctx.fill();
         }
 
+        function drawDuckPin(x, y) {
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.moveTo(x + pinWidth / 2, y); // Top point (head)
+            ctx.quadraticCurveTo(x, y + pinHeight / 2, x + pinWidth / 2, y + pinHeight); // Left body
+            ctx.quadraticCurveTo(x + pinWidth, y + pinHeight / 2, x + pinWidth / 2, y); // Right body
+            ctx.closePath();
+            ctx.fill();
+        }
+
         function drawPins() {
             pins.forEach(pin => {
                 if (!pin.knocked) {
-                    ctx.fillStyle = 'white';
-                    ctx.beginPath();
-                    ctx.moveTo(pin.x + pinWidth / 2, pin.y); // Top point
-                    ctx.lineTo(pin.x, pin.y + pinHeight); // Bottom left
-                    ctx.lineTo(pin.x + pinWidth, pin.y + pinHeight); // Bottom right
-                    ctx.closePath();
-                    ctx.fill();
+                    drawDuckPin(pin.x, pin.y);
                 }
             });
         }
@@ -142,7 +146,7 @@
 
         function resetBall() {
             ballX = 500; // Reset to initial position
-            ballY = 450;
+            ballY = 350;
         }
 
         function endGame(message) {
