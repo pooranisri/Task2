@@ -44,6 +44,8 @@
         const pinWidth = 20;
         const pinHeight = 40;
         let arrowAngle = 0;
+        let ballMoving = false;
+        const ballSpeed = 5; // Speed of the ball
 
         // Initialize pins in a triangular formation
         function initializePins() {
@@ -66,10 +68,10 @@
             ctx.fillRect(0, 360, canvas.width, 40); // Bowling lane
         }
 
-        function drawBall() {
+        function drawBall(x, y) {
             ctx.fillStyle = 'red';
             ctx.beginPath();
-            ctx.arc(ballX, ballY, 15, 0, Math.PI * 2);
+            ctx.arc(x, y, 15, 0, Math.PI * 2);
             ctx.fill();
         }
 
@@ -111,16 +113,31 @@
         function gameLoop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBowlingLane();
-            drawBall();
+            drawBall(ballX, ballY);
             drawPins();
             drawArrow();
+
+            if (ballMoving) {
+                // Move the ball in the direction of the arrow
+                ballX += ballSpeed * Math.cos(arrowAngle);
+                ballY += ballSpeed * Math.sin(arrowAngle);
+
+                // Check for collisions with pins
+                checkCollision();
+
+                // Stop moving if the ball reaches a certain position
+                if (ballY < 0) {
+                    ballMoving = false; // Stop moving the ball when it goes off-screen
+                }
+            }
+
             updateScore();
             requestAnimationFrame(gameLoop);
         }
 
         canvas.addEventListener('click', (e) => {
             if (e.button === 0) { // Left click
-                checkCollision();
+                ballMoving = true; // Start moving the ball
             }
         });
 
