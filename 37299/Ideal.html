@@ -27,29 +27,44 @@
             color: #000;
             margin-top: 10px;
         }
+        #message {
+            font-size: 24px;
+            color: #ff6347;
+            margin-top: 20px;
+        }
+        #startButton {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>Bowling</h1>
     <canvas id="gameCanvas" width="800" height="400"></canvas>
     <div id="scoreboard">Score: 0</div>
+    <div id="message"></div>
+    <button id="startButton">Start Game</button>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const ballRadius = 15;
-        let ballX = 400;  // Ball's horizontal position
-        let ballY = 350;  // Ball's vertical position
+        let ballX = 400;  
+        let ballY = 350;  
         let score = 0;
         const pins = [];
         const pinWidth = 20;
         const pinHeight = 40;
         let arrowAngle = 0;
         let ballMoving = false;
-        const ballSpeed = 5; // Speed of the ball
+        const ballSpeed = 5; 
+        let attempts = 0;
+        let gameOver = false;
 
         // Initialize pins in a triangular formation
         function initializePins() {
+            pins.length = 0; // Clear existing pins
             const rows = 4;
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col <= row; col++) {
@@ -116,6 +131,12 @@
             ballY = 350;
         }
 
+        function endGame(message) {
+            gameOver = true;
+            document.getElementById('message').innerText = message;
+            ballMoving = false;
+        }
+
         function gameLoop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBowlingLane();
@@ -124,17 +145,20 @@
             drawArrow();
 
             if (ballMoving) {
-                // Move the ball in the direction of the arrow
                 ballX += ballSpeed * Math.cos(arrowAngle);
                 ballY += ballSpeed * Math.sin(arrowAngle);
-
-                // Check for collisions with pins
                 checkCollision();
 
-                // Stop moving if the ball goes off-screen
                 if (ballY < 0 || pins.every(pin => pin.knocked)) {
+                    attempts++;
+                    if (score === 10) {
+                        endGame("Congratulations, STRIKE!");
+                    } else if (attempts === 2) {
+                        endGame("GAME OVER! You didn't knock down all the pins.");
+                    } else {
+                        resetBall(); // Reset ball position for the next chance
+                    }
                     ballMoving = false; // Stop moving the ball
-                    resetBall(); // Reset ball position
                 }
             }
 
@@ -142,15 +166,25 @@
             requestAnimationFrame(gameLoop);
         }
 
+        document.getElementById('startButton').addEventListener('click', () => {
+            score = 0;
+            attempts = 0;
+            gameOver = false;
+            document.getElementById('message').innerText = "";
+            resetBall();
+            initializePins();
+            ballMoving = false;
+            gameLoop();
+        });
+
         canvas.addEventListener('click', (e) => {
-            if (e.button === 0) { // Left click
-                if (!ballMoving) { // Start moving the ball only if it's not already moving
+            if (e.button === 0 && !gameOver) {
+                if (!ballMoving) {
                     ballMoving = true; 
                 }
             }
         });
 
-        // Arrow movement based on mouse position
         canvas.addEventListener('mousemove', (e) => {
             const dx = e.clientX - canvas.offsetLeft - ballX;
             const dy = e.clientY - canvas.offsetTop - ballY;
