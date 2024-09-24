@@ -18,6 +18,11 @@
         h1 {
             font-size: 36px;
             color: #333;
+            margin-bottom: 10px;
+        }
+        #instructions {
+            font-size: 18px;
+            color: #333;
             margin-bottom: 20px;
         }
         #gameCanvas {
@@ -32,6 +37,7 @@
 </head>
 <body>
     <h1>Bowling</h1>
+    <div id="instructions">Left Click to Move the Ball, Right Click to Strike the Pins</div>
     <canvas id="gameCanvas" width="600" height="400"></canvas>
     <div id="scoreboard">Score: 0</div>
     
@@ -40,7 +46,7 @@
         const ctx = canvas.getContext('2d');
         const pins = [];
         let score = 0;
-        let ballX = 50, ballY = 350;
+        let ballX = 50, ballY = 350; // Starting position of the ball
         let ballRadius = 15;
         let ballMoving = false;
 
@@ -127,9 +133,17 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Mouse click event to roll the ball
-        canvas.addEventListener('click', () => {
-            ballMoving = true; // Start moving the ball
+        // Mouse left click event to move the ball
+        canvas.addEventListener('click', (event) => {
+            if (event.button === 0) { // Left click
+                ballMoving = true; // Start moving the ball
+            }
+        });
+
+        // Mouse right click event to strike the pins
+        canvas.addEventListener('contextmenu', (event) => {
+            event.preventDefault(); // Prevent default context menu
+            detectCollisions(); // Check for collisions with pins
         });
 
         // Initialize game
