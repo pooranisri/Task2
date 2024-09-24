@@ -25,17 +25,22 @@
         #scoreboard {
             font-size: 24px;
             color: #000;
-            margin-top: 10px;
+            position: absolute;
+            right: 20px;
+            top: 200px; /* Centered in the middle of the alley */
         }
         #message {
             font-size: 24px;
             color: #ff6347;
-            margin-top: 20px;
+            position: absolute;
+            top: 50px; /* Above the alley */
+            left: 50%; 
+            transform: translateX(-50%);
         }
         #controls {
             position: absolute;
             right: 20px;
-            top: 20px;
+            top: 250px; /* Below the scoreboard */
             text-align: right;
         }
         #startButton {
@@ -47,10 +52,10 @@
 </head>
 <body>
     <h1>Bowling</h1>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <canvas id="gameCanvas" width="600" height="600"></canvas>
+    <div id="scoreboard">Score: 0</div>
+    <div id="message"></div>
     <div id="controls">
-        <div id="scoreboard">Score: 0</div>
-        <div id="message"></div>
         <button id="startButton">New Game</button>
     </div>
 
@@ -58,7 +63,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const ballRadius = 15;
-        let ballX = 400;  
+        let ballX = 300;  
         let ballY = 550;  
         let score = 0;
         const pins = [];
@@ -78,7 +83,7 @@
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col <= row; col++) {
                     pins.push({
-                        x: 400 + (col - row / 2) * (pinWidth + 10),
+                        x: 300 + (col - row / 2) * (pinWidth + 10),
                         y: 30 + row * (pinHeight + 10), // Move pins closer to the top
                         knocked: false
                     });
@@ -155,7 +160,7 @@
         }
 
         function resetBall() {
-            ballX = 400; // Reset to initial position
+            ballX = 300; // Reset to initial position
             ballY = 550;
         }
 
