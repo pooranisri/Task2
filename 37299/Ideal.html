@@ -149,6 +149,7 @@
             gameOver = true;
             document.getElementById('message').innerText = message;
             ballMoving = false;
+            arrowVisible = true; // Show the arrow again after a strike or end
         }
 
         function gameLoop() {
@@ -196,8 +197,9 @@
             if (e.button === 0 && !gameOver) {
                 if (!ballMoving) {
                     ballMoving = true; 
+                } else {
+                    arrowVisible = false; // Hide the arrow on click to roll the ball
                 }
-                arrowVisible = false; // Hide the arrow on click to roll the ball
             }
         });
 
