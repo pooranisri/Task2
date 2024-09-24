@@ -42,6 +42,7 @@
         let score = 0;
         let ballX = 50, ballY = 350;
         let ballRadius = 15;
+        let ballMoving = false;
 
         // Initialize pin positions
         function initPins() {
@@ -112,19 +113,23 @@
             drawLane();
             drawPins();
             drawBall();
+            if (ballMoving) {
+                ballX += 5; // Move ball forward
+                if (ballX > canvas.width) {
+                    ballX = 50; // Reset ball position
+                    ballMoving = false; // Stop ball movement
+                    pins.forEach(row => row.forEach(pin => pin.knocked = false)); // Reset pins
+                    score = 0; // Reset score
+                    updateScore();
+                }
+            }
             detectCollisions();
             requestAnimationFrame(gameLoop);
         }
 
         // Mouse click event to roll the ball
         canvas.addEventListener('click', () => {
-            ballX += 100; // Move ball forward
-            if (ballX > canvas.width) {
-                ballX = 50; // Reset ball position
-                pins.forEach(row => row.forEach(pin => pin.knocked = false)); // Reset pins
-                score = 0; // Reset score
-                updateScore();
-            }
+            ballMoving = true; // Start moving the ball
         });
 
         // Initialize game
