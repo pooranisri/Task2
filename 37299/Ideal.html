@@ -10,25 +10,34 @@
             flex-direction: column;
             align-items: center;
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #87CEEB; /* Sky blue background */
         }
         canvas {
             border: 2px solid #333;
-            background: #e0e0e0;
+            background: #D3D3D3; /* Light gray for the bowling lane */
         }
         #scoreboard {
             margin: 20px;
             font-size: 24px;
+            color: #333;
         }
         button {
             margin-top: 10px;
             padding: 10px;
             font-size: 18px;
+            background-color: #4CAF50; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <h1>Bowling Game</h1>
+    <h1 style="color: #FF4500;">Bowling Game</h1>
     <canvas id="bowlingCanvas" width="600" height="400"></canvas>
     <div id="scoreboard">Score: 0</div>
     <button id="resetButton">Reset Game</button>
@@ -48,9 +57,9 @@
         const laneHeight = 200;
         const ballRadius = 15;
         const pinPositions = [
-            { x: 290, y: 50 }, { x: 310, y: 50 }, { x: 300, y: 70 }, // Back row
-            { x: 280, y: 90 }, { x: 300, y: 90 }, { x: 320, y: 90 }, // Middle row
-            { x: 270, y: 110 }, { x: 290, y: 110 }, { x: 310, y: 110 }, { x: 330, y: 110 } // Front row
+            { x: 290, y: 50 }, { x: 310, y: 50 }, { x: 300, y: 70 },
+            { x: 280, y: 90 }, { x: 300, y: 90 }, { x: 320, y: 90 },
+            { x: 270, y: 110 }, { x: 290, y: 110 }, { x: 310, y: 110 }, { x: 330, y: 110 }
         ];
 
         let ballX = 50, ballY = 180, score = 0;
@@ -58,7 +67,7 @@
 
         function drawLane() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#c2c2c2';
+            ctx.fillStyle = '#8B4513'; // Brown color for the lane
             ctx.fillRect(0, 0, laneWidth, laneHeight);
             drawPins();
             drawBall();
@@ -69,16 +78,17 @@
             pins.forEach((isStanding, index) => {
                 if (isStanding) {
                     const { x, y } = pinPositions[index];
-                    ctx.beginPath();
-                    ctx.arc(x, y, 10, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.stroke();
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(Math.PI / 4); // Rotate pins slightly
+                    ctx.fillRect(-5, -15, 10, 30); // Draw pin shape
+                    ctx.restore();
                 }
             });
         }
 
         function drawBall() {
-            ctx.fillStyle = '#ff0000';
+            ctx.fillStyle = '#FF4500'; // Bright orange for the ball
             ctx.beginPath();
             ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
             ctx.fill();
@@ -90,7 +100,7 @@
                 if (isStanding) {
                     const { x, y } = pinPositions[index];
                     const distance = Math.sqrt((ballX - x) ** 2 + (ballY - y) ** 2);
-                    if (distance < ballRadius + 10) { // 10 is pin radius
+                    if (distance < ballRadius + 10) { // 10 is pin height/2
                         pins[index] = false;
                         score++;
                         rollSound.play();
