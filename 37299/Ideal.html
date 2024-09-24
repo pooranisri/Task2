@@ -15,6 +15,11 @@
             background-color: #87CEFA;
             font-family: Arial, sans-serif;
         }
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 20px;
+        }
         #gameCanvas {
             border: 2px solid #000;
             background-color: #FFF;
@@ -26,6 +31,7 @@
     </style>
 </head>
 <body>
+    <h1>Bowling</h1>
     <canvas id="gameCanvas" width="600" height="400"></canvas>
     <div id="scoreboard">Score: 0</div>
     
@@ -36,10 +42,6 @@
         let score = 0;
         let ballX = 50, ballY = 350;
         let ballRadius = 15;
-
-        // Load sound effects
-        const strikeSound = new Audio('https://example.com/strike.mp3'); // Replace with a real URL
-        const rollSound = new Audio('https://example.com/roll.mp3'); // Replace with a real URL
 
         // Initialize pin positions
         function initPins() {
@@ -87,7 +89,7 @@
             document.getElementById('scoreboard').innerText = `Score: ${score}`;
         }
 
-        // Detect collision
+        // Detect collision with pins
         function detectCollisions() {
             pins.forEach(row => {
                 row.forEach(pin => {
@@ -98,7 +100,6 @@
                         ballY - ballRadius < pin.y + 10) {
                         pin.knocked = true;
                         score++;
-                        strikeSound.play();
                     }
                 });
             });
@@ -117,7 +118,6 @@
 
         // Mouse click event to roll the ball
         canvas.addEventListener('click', () => {
-            rollSound.play();
             ballX += 100; // Move ball forward
             if (ballX > canvas.width) {
                 ballX = 50; // Reset ball position
