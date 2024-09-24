@@ -37,13 +37,14 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        let ballX = 50, ballY = 350;
+        const ballX = 100, ballY = 350;
         let score = 0;
         const pins = [];
         const pinWidth = 20;
         const pinHeight = 40;
+        let arrowAngle = 0;
 
-        // Function to initialize pins in a triangular formation
+        // Initialize pins in a triangular formation
         function initializePins() {
             const rows = 4;
             for (let row = 0; row < rows; row++) {
@@ -80,6 +81,15 @@
             });
         }
 
+        function drawArrow() {
+            ctx.save();
+            ctx.translate(ballX, ballY);
+            ctx.rotate(arrowAngle);
+            ctx.fillStyle = 'yellow';
+            ctx.fillRect(0, -5, 100, 10); // Arrow pointing direction
+            ctx.restore();
+        }
+
         function updateScore() {
             document.getElementById('scoreboard').innerText = `Score: ${score}`;
         }
@@ -102,21 +112,22 @@
             drawBowlingLane();
             drawBall();
             drawPins();
-            checkCollision();
+            drawArrow();
             updateScore();
             requestAnimationFrame(gameLoop);
         }
 
         canvas.addEventListener('click', (e) => {
             if (e.button === 0) { // Left click
-                ballX += 100;
-            } else if (e.button === 2) { // Right click
                 checkCollision();
             }
         });
 
-        canvas.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
+        // Arrow movement based on mouse position
+        canvas.addEventListener('mousemove', (e) => {
+            const dx = e.clientX - canvas.offsetLeft - ballX;
+            const dy = e.clientY - canvas.offsetTop - ballY;
+            arrowAngle = Math.atan2(dy, dx);
         });
 
         // Initialize pins and start the game loop
