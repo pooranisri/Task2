@@ -111,6 +111,11 @@
             });
         }
 
+        function resetBall() {
+            ballX = 400; // Reset to initial position
+            ballY = 350;
+        }
+
         function gameLoop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBowlingLane();
@@ -128,7 +133,8 @@
 
                 // Stop moving if the ball goes off-screen
                 if (ballY < 0 || pins.every(pin => pin.knocked)) {
-                    ballMoving = false; // Stop moving the ball when it goes off-screen or all pins are knocked down
+                    ballMoving = false; // Stop moving the ball
+                    resetBall(); // Reset ball position
                 }
             }
 
@@ -138,9 +144,9 @@
 
         canvas.addEventListener('click', (e) => {
             if (e.button === 0) { // Left click
-                ballMoving = true; // Start moving the ball
-                ballX = 400; // Reset ball position for each throw
-                ballY = 350; // Fixed vertical position for the ball
+                if (!ballMoving) { // Start moving the ball only if it's not already moving
+                    ballMoving = true; 
+                }
             }
         });
 
