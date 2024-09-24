@@ -37,8 +37,9 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const ballX = 400;  // Fixed horizontal position for the ball
-        let ballY = 350;     // Fixed vertical position for the ball
+        const ballRadius = 15;
+        let ballX = 400;  // Ball's horizontal position
+        let ballY = 350;  // Ball's vertical position
         let score = 0;
         const pins = [];
         const pinWidth = 20;
@@ -68,10 +69,10 @@
             ctx.fillRect(0, 360, canvas.width, 40); // Bowling lane
         }
 
-        function drawBall(x, y) {
+        function drawBall() {
             ctx.fillStyle = 'red';
             ctx.beginPath();
-            ctx.arc(x, y, 15, 0, Math.PI * 2);
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
             ctx.fill();
         }
 
@@ -100,10 +101,10 @@
         function checkCollision() {
             pins.forEach(pin => {
                 if (!pin.knocked && 
-                    ballX + 15 > pin.x && 
-                    ballX - 15 < pin.x + pinWidth && 
-                    ballY + 15 > pin.y && 
-                    ballY - 15 < pin.y + pinHeight) {
+                    ballX + ballRadius > pin.x && 
+                    ballX - ballRadius < pin.x + pinWidth && 
+                    ballY + ballRadius > pin.y && 
+                    ballY - ballRadius < pin.y + pinHeight) {
                     pin.knocked = true;
                     score++;
                 }
@@ -113,7 +114,7 @@
         function gameLoop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBowlingLane();
-            drawBall(ballX, ballY);
+            drawBall();
             drawPins();
             drawArrow();
 
@@ -125,7 +126,7 @@
                 // Check for collisions with pins
                 checkCollision();
 
-                // Stop moving if the ball reaches a certain position (below the pins)
+                // Stop moving if the ball goes off-screen
                 if (ballY < 0 || pins.every(pin => pin.knocked)) {
                     ballMoving = false; // Stop moving the ball when it goes off-screen or all pins are knocked down
                 }
@@ -138,6 +139,8 @@
         canvas.addEventListener('click', (e) => {
             if (e.button === 0) { // Left click
                 ballMoving = true; // Start moving the ball
+                ballX = 400; // Reset ball position for each throw
+                ballY = 350; // Fixed vertical position for the ball
             }
         });
 
