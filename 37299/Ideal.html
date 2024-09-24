@@ -44,7 +44,7 @@
     <canvas id="gameCanvas" width="800" height="400"></canvas>
     <div id="scoreboard">Score: 0</div>
     <div id="message"></div>
-    <button id="startButton">Start Game</button>
+    <button id="startButton">New Game</button>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -56,11 +56,11 @@
         const pins = [];
         const pinWidth = 20;
         const pinHeight = 40;
+        let arrowAngle = 0;
         let ballMoving = false;
         const ballSpeed = 5; 
         let attempts = 0;
         let gameOver = false;
-        let showArrow = true; // Control to show or hide the arrow
 
         // Initialize pins in a triangular formation
         function initializePins() {
@@ -101,16 +101,12 @@
         }
 
         function drawArrow() {
-            if (showArrow) {
-                ctx.setLineDash([5, 5]); // Dotted line
-                ctx.beginPath();
-                ctx.moveTo(ballX, ballY);
-                ctx.lineTo(ballX + 100, ballY); // Arrow pointing straight
-                ctx.strokeStyle = 'yellow';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                ctx.setLineDash([]); // Reset line dash
-            }
+            ctx.save();
+            ctx.translate(ballX, ballY);
+            ctx.rotate(arrowAngle);
+            ctx.fillStyle = 'yellow';
+            ctx.fillRect(0, -5, 100, 10); // Arrow pointing direction
+            ctx.restore();
         }
 
         function updateScore() {
@@ -149,10 +145,11 @@
             drawArrow();
 
             if (ballMoving) {
-                ballX += ballSpeed; // Move the ball straight
+                ballX += ballSpeed * Math.cos(arrowAngle);
+                ballY += ballSpeed * Math.sin(arrowAngle);
                 checkCollision();
 
-                if (ballX > canvas.width) {
+                if (ballY < 0 || pins.every(pin => pin.knocked)) {
                     attempts++;
                     if (score === 10) {
                         endGame("Congratulations, STRIKE!");
@@ -162,7 +159,6 @@
                         resetBall(); // Reset ball position for the next chance
                     }
                     ballMoving = false; // Stop moving the ball
-                    showArrow = false; // Hide the arrow after the strike
                 }
             }
 
@@ -174,7 +170,6 @@
             score = 0;
             attempts = 0;
             gameOver = false;
-            showArrow = true; // Show arrow at the start of the game
             document.getElementById('message').innerText = "";
             resetBall();
             initializePins();
@@ -183,14 +178,17 @@
         });
 
         canvas.addEventListener('click', (e) => {
-            // Check if the click is within the ball
+            if (e.button === 0 && !gameOver) {
+                if (!ballMoving) {
+                    ballMoving = true; 
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
             const dx = e.clientX - canvas.offsetLeft - ballX;
             const dy = e.clientY - canvas.offsetTop - ballY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (e.button === 0 && distance < ballRadius && !gameOver && !ballMoving) {
-                ballMoving = true; // Start moving the ball
-            }
+            arrowAngle = Math.atan2(dy, dx);
         });
 
         // Initialize pins and start the game loop
