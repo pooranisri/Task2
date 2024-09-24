@@ -149,7 +149,7 @@
             gameOver = true;
             document.getElementById('message').innerText = message;
             ballMoving = false;
-            arrowVisible = true; // Show the arrow again after a strike or end
+            arrowVisible = true; // Show the arrow again after the game ends
         }
 
         function gameLoop() {
@@ -164,7 +164,8 @@
                 ballY += ballSpeed * Math.sin(arrowAngle);
                 checkCollision();
 
-                if (ballY < 0 || pins.every(pin => pin.knocked)) {
+                // Stop the ball when it reaches the bottom of the canvas or goes off-screen
+                if (ballY < 0 || ballY > canvas.height) {
                     attempts++;
                     if (score === 10) {
                         endGame("Congratulations, STRIKE!");
@@ -172,6 +173,7 @@
                         endGame("GAME OVER! You didn't knock down all the pins.");
                     } else {
                         resetBall(); // Reset ball position for the next chance
+                        arrowVisible = true; // Show the arrow again after resetting
                     }
                     ballMoving = false; // Stop moving the ball
                 }
@@ -197,7 +199,6 @@
             if (e.button === 0 && !gameOver) {
                 if (!ballMoving) {
                     ballMoving = true; 
-                } else {
                     arrowVisible = false; // Hide the arrow on click to roll the ball
                 }
             }
