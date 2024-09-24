@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bowling Game for Kids</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 2px solid #333;
+            background: #e0e0e0;
+        }
+        #scoreboard {
+            margin: 20px;
+            font-size: 24px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bowling Game</h1>
+    <canvas id="bowlingCanvas" width="600" height="400"></canvas>
+    <div id="scoreboard">Score: 0</div>
+    <button id="resetButton">Reset Game</button>
+
+    <audio id="strikeSound" src="strike.mp3" preload="auto"></audio>
+    <audio id="rollSound" src="roll.mp3" preload="auto"></audio>
+
+    <script>
+        const canvas = document.getElementById('bowlingCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreboard = document.getElementById('scoreboard');
+        const resetButton = document.getElementById('resetButton');
+        const strikeSound = document.getElementById('strikeSound');
+        const rollSound = document.getElementById('rollSound');
+
+        const laneWidth = 400;
+        const laneHeight = 200;
+        const ballRadius = 15;
+        const pinPositions = [
+            { x: 290, y: 50 }, { x: 310, y: 50 }, { x: 300, y: 70 }, // Back row
+            { x: 280, y: 90 }, { x: 300, y: 90 }, { x: 320, y: 90 }, // Middle row
+            { x: 270, y: 110 }, { x: 290, y: 110 }, { x: 310, y: 110 }, { x: 330, y: 110 } // Front row
+        ];
+
+        let ballX = 50, ballY = 180, score = 0;
+        let pins = Array(10).fill(true); // All pins standing
+
+        function drawLane() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#c2c2c2';
+            ctx.fillRect(0, 0, laneWidth, laneHeight);
+            drawPins();
+            drawBall();
+        }
+
+        function drawPins() {
+            ctx.fillStyle = '#fff';
+            pins.forEach((isStanding, index) => {
+                if (isStanding) {
+                    const { x, y } = pinPositions[index];
+                    ctx.beginPath();
+                    ctx.arc(x, y, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            });
+        }
+
+        function drawBall() {
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function detectCollisions() {
+            pins.forEach((isStanding, index) => {
+                if (isStanding) {
+                    const { x, y } = pinPositions[index];
+                    const distance = Math.sqrt((ballX - x) ** 2 + (ballY - y) ** 2);
+                    if (distance < ballRadius + 10) { // 10 is pin radius
+                        pins[index] = false;
+                        score++;
+                        rollSound.play();
+                    }
+                }
+            });
+        }
+
+        function updateScoreboard() {
+            scoreboard.innerText = `Score: ${score}`;
+            if (score === 10) {
+                strikeSound.play();
+                alert('Strike! All pins knocked down!');
+            }
+        }
+
+        canvas.addEventListener('click', () => {
+            ballX = 50; // Reset ball position
+            ballY = 180; // Reset ball position
+            detectCollisions();
+            drawLane();
+            updateScoreboard();
+        });
+
+        resetButton.addEventListener('click', () => {
+            score = 0;
+            pins.fill(true);
+            drawLane();
+            updateScoreboard();
+        });
+
+        drawLane(); // Initial draw
+    </script>
+</body>
+</html>
