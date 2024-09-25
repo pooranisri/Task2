@@ -85,10 +85,12 @@
         }
 
         function drawBall() {
-            canCtx.fillStyle = 'red';
-            canCtx.beginPath();
-            canCtx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-            canCtx.fill();
+            if (!gameOver) {
+                canCtx.fillStyle = 'red';
+                canCtx.beginPath();
+                canCtx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+                canCtx.fill();
+            }
         }
 
         function drawDuckPin(x, y) {
@@ -110,7 +112,7 @@
         }
 
         function drawArrow() {
-            if (arrowVisible) {
+            if (arrowVisible && !gameOver) {
                 canCtx.save();
                 canCtx.translate(ballX, ballY);
                 canCtx.rotate(arrowAngle);
@@ -152,7 +154,7 @@
             gameOver = true;
             document.getElementById('message').innerText = message;
             ballMoving = false;
-            arrowVisible = true;
+            arrowVisible = false;
         }
 
         function gameLoop() {
@@ -193,7 +195,7 @@
             resetBall();
             initializePins();
             ballMoving = false;
-            arrowVisible = true;
+            arrowVisible = true; 
             gameLoop();
         });
 
@@ -201,15 +203,17 @@
             if (e.button === 0 && !gameOver) {
                 if (!ballMoving) {
                     ballMoving = true; 
-                    arrowVisible = false;
+                    arrowVisible = false; 
                 }
             }
         });
 
         canvas.addEventListener('mousemove', (e) => {
-            const dx = e.clientX - canvas.offsetLeft - ballX;
-            const dy = e.clientY - canvas.offsetTop - ballY;
-            arrowAngle = Math.atan2(dy, dx);
+            if (!gameOver) { 
+                const dx = e.clientX - canvas.offsetLeft - ballX;
+                const dy = e.clientY - canvas.offsetTop - ballY;
+                arrowAngle = Math.atan2(dy, dx);
+            }
         });
 
         initializePins();
