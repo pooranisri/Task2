@@ -57,7 +57,7 @@
         const pinHeight = 40;
         let arrowAngle = 0;
         let ballMoving = false;
-        const ballSpeed = 3;
+        const ballSpeed = 2;
         let attempts = 0;
         let gameOver = false;
         let arrowVisible = true;
@@ -209,7 +209,7 @@
         });
 
         canvas.addEventListener('mousemove', (e) => {
-            if (!gameOver) { 
+            if (!gameOver && !ballMoving) { 
                 const dx = e.clientX - canvas.offsetLeft - ballX;
                 const dy = e.clientY - canvas.offsetTop - ballY;
                 arrowAngle = Math.atan2(dy, dx);
