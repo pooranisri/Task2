@@ -1,4 +1,5 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,25 +13,30 @@
             margin: 0;
             background-color: #87CEEB;
         }
+
         h1 {
             font-family: Arial, sans-serif;
             color: #ff6347;
             margin: 20px;
         }
+
         #gameCanvas {
             border: 2px solid #000;
             background-color: #D3D3D3;
         }
+
         #scoreboard {
             font-size: 24px;
             color: #000;
             margin-top: 10px;
         }
+
         #message {
             font-size: 24px;
             color: #ff6347;
             margin-top: 20px;
         }
+
         #newButton {
             padding: 10px 20px;
             font-size: 18px;
@@ -38,6 +44,7 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Bowling</h1>
     <canvas id="gameCanvas" width="1000" height="440"></canvas>
@@ -49,8 +56,8 @@
         const canvas = document.getElementById('gameCanvas');
         const canCtx = canvas.getContext('2d');
         const ballRadius = 15;
-        let ballX = 500;  
-        let ballY = 400;  
+        let ballX = 500;
+        let ballY = 400;
         let score = 0;
         const pins = [];
         const pinWidth = 20;
@@ -134,10 +141,10 @@
 
         function checkCollision() {
             pins.forEach(pin => {
-                if (!pin.knocked && 
-                    ballX + ballRadius > pin.x && 
-                    ballX - ballRadius < pin.x + pinWidth && 
-                    ballY + ballRadius > pin.y && 
+                if (!pin.knocked &&
+                    ballX + ballRadius > pin.x &&
+                    ballX - ballRadius < pin.x + pinWidth &&
+                    ballY + ballRadius > pin.y &&
                     ballY - ballRadius < pin.y + pinHeight) {
                     pin.knocked = true;
                     score++;
@@ -169,12 +176,22 @@
                 ballY += ballSpeed * Math.sin(arrowAngle);
                 checkCollision();
 
-                if (ballY < 0 || ballY > canvas.height) {
+                // Check for boundaries
+                if (ballX < 0 || ballX > canvas.width || ballY < 0) {
+                    attempts++;
+                    if (attempts === 3) {
+                        endGame("GAME OVER! You didn't knock down all the pins.");
+                    } else {
+                        resetBall();
+                        arrowVisible = true;
+                    }
+                    ballMoving = false;
+                }
+
+                if (ballY > canvas.height) {
                     attempts++;
                     if (score === 10) {
                         endGame("Congratulations, STRIKE!");
-                    } else if (attempts === 3) {
-                        endGame("GAME OVER! You didn't knock down all the pins.");
                     } else {
                         resetBall();
                         arrowVisible = true;
@@ -195,21 +212,21 @@
             resetBall();
             initializePins();
             ballMoving = false;
-            arrowVisible = true; 
+            arrowVisible = true;
             gameLoop();
         });
 
         canvas.addEventListener('click', (e) => {
             if (e.button === 0 && !gameOver) {
                 if (!ballMoving) {
-                    ballMoving = true; 
-                    arrowVisible = false; 
+                    ballMoving = true;
+                    arrowVisible = false;
                 }
             }
         });
 
         canvas.addEventListener('mousemove', (e) => {
-            if (!gameOver && !ballMoving) { 
+            if (!gameOver && !ballMoving) {
                 const dx = e.clientX - canvas.offsetLeft - ballX;
                 const dy = e.clientY - canvas.offsetTop - ballY;
                 arrowAngle = Math.atan2(dy, dx);
@@ -220,4 +237,5 @@
         gameLoop();
     </script>
 </body>
+
 </html>
