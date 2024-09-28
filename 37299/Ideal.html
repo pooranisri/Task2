@@ -69,7 +69,6 @@
         let gameOver = false;
         let arrowVisible = true;
 
-        // Initialize pins in a triangular formation at the top of the alley
         function initializePins() {
             pins.length = 0;
             const rows = 4;
@@ -161,7 +160,7 @@
             gameOver = true;
             document.getElementById('message').innerText = message;
             ballMoving = false;
-            arrowVisible = false;
+            arrowVisible = false; // Hide arrow on game over
         }
 
         function gameLoop() {
@@ -177,27 +176,36 @@
                 checkCollision();
 
                 // Check for boundaries
-                if (ballX < 0 || ballX > canvas.width || ballY < 0) {
+                if (ballX - ballRadius < 0 || ballX + ballRadius > canvas.width || ballY - ballRadius < 0) {
                     attempts++;
-                    if (attempts === 3) {
-                        endGame("GAME OVER! You didn't knock down all the pins.");
-                    } else {
-                        resetBall();
-                        arrowVisible = true;
-                    }
+                    resetBall();
                     ballMoving = false;
-                }
-
-                if (ballY > canvas.height) {
+                    arrowVisible = true; // Show the arrow for the next attempt
+                    
+                    // Check if game over
+                    if (attempts >= 3) {
+                        endGame("GAME OVER! You didn't knock down all the pins.");
+                    }
+                } else if (ballY + ballRadius > canvas.height) {
                     attempts++;
+                    resetBall();
+                    ballMoving = false;
+                    arrowVisible = false; // Hide the arrow after the ball goes out
+                    
+                    // Check for strike
                     if (score === 10) {
                         endGame("Congratulations, STRIKE!");
+                    } else if (attempts >= 3) {
+                        endGame("GAME OVER! You didn't knock down all the pins.");
                     } else {
-                        resetBall();
-                        arrowVisible = true;
+                        arrowVisible = true; // Show the arrow for the next attempt
                     }
-                    ballMoving = false;
                 }
+            }
+
+            // Check for game over due to pins knocked down
+            if (attempts < 3 && score === 10) {
+                endGame("Congratulations, STRIKE!");
             }
 
             updateScore();
@@ -212,7 +220,7 @@
             resetBall();
             initializePins();
             ballMoving = false;
-            arrowVisible = true;
+            arrowVisible = true; // Reset arrow visibility for new game
             gameLoop();
         });
 
