@@ -160,7 +160,7 @@
             gameOver = true;
             document.getElementById('message').innerText = message;
             ballMoving = false;
-            arrowVisible = false; // Hide arrow on game over
+            arrowVisible = false;
         }
 
         function gameLoop() {
@@ -180,7 +180,7 @@
                     attempts++;
                     resetBall();
                     ballMoving = false;
-                    arrowVisible = true; // Show the arrow for the next attempt
+                    arrowVisible = true;
                     
                     // Check if game over
                     if (attempts >= 3) {
@@ -190,7 +190,7 @@
                     attempts++;
                     resetBall();
                     ballMoving = false;
-                    arrowVisible = false; // Hide the arrow after the ball goes out
+                    arrowVisible = false;
                     
                     // Check for strike
                     if (score === 10) {
@@ -198,7 +198,7 @@
                     } else if (attempts >= 3) {
                         endGame("GAME OVER! You didn't knock down all the pins.");
                     } else {
-                        arrowVisible = true; // Show the arrow for the next attempt
+                        arrowVisible = true;
                     }
                 }
             }
@@ -220,7 +220,7 @@
             resetBall();
             initializePins();
             ballMoving = false;
-            arrowVisible = true; // Reset arrow visibility for new game
+            arrowVisible = true;
             gameLoop();
         });
 
